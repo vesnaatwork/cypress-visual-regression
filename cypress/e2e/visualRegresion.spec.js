@@ -1,5 +1,6 @@
 import pixelmatch from 'pixelmatch';
 import { PNG } from 'pngjs';
+
 const fs = require('fs');
 
 describe('Visual Regression Testing', () => {
@@ -39,31 +40,9 @@ describe('Visual Regression Testing', () => {
         }
 
         const fileName = `homepage-${description}-${name}`;
-        const baseFolder = 'cypress/screenshots/base';
-        const compareFolder = 'cypress/screenshots/compare';
-        const diffFolder = 'cypress/screenshots/diff';
+        const folder = isBaseline ? 'cypress/screenshots/base' : 'cypress/screenshots/compare';
 
-        if (isBaseline) {
-          cy.screenshot(`${baseFolder}/${fileName}`);
-        } else {
-          cy.screenshot(`${compareFolder}/${fileName}`);
-          cy.readFile(`${baseFolder}/${fileName}.png`, 'base64').then((baseImageBase64) => {
-            const baseImageBuffer = Buffer.from(baseImageBase64, 'base64');
-            const baseImage = PNG.sync.read(baseImageBuffer);
-
-            cy.readFile(`${compareFolder}/${fileName}.png`, 'base64').then((compareImageBase64) => {
-              const compareImageBuffer = Buffer.from(compareImageBase64, 'base64');
-              const compareImage = PNG.sync.read(compareImageBuffer);
-
-              const diff = new PNG({ width: baseImage.width, height: baseImage.height });
-              const numDiffPixels = pixelmatch(baseImage.data, compareImage.data, diff.data, baseImage.width, baseImage.height);
-
-              cy.writeFile(`${diffFolder}/${fileName}-diff.png`, PNG.sync.write(diff), 'base64');
-
-              expect(numDiffPixels).to.be.lessThan(100); // Adjust to your tolerance level
-            });
-          });
-        }
+        cy.captureScreenshot(fileName, folder);
       });
     });
   });

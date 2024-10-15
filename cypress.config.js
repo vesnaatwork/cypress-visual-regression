@@ -18,7 +18,7 @@ module.exports = defineConfig({
     },
     // Define different URLs here for each environment
     env: {
-      devUrl: 'http://dev.example.com',
+      devUrl: 'http://workco-2020-dev.s3-website-us-east-1.amazonaws.com/',
       prodUrl: 'http://work.co',
       baseline: true, // Default to baseline capture
     },
