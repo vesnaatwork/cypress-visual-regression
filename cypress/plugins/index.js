@@ -2,7 +2,6 @@ const fs = require('fs-extra');
 const path = require('path');
 
 module.exports = (on, config) => {
-  // Register the tasks here
   on('task', {
     readScreenshotFile({ filePath }) {
       const resolvedPath = path.resolve(filePath);
@@ -14,13 +13,6 @@ module.exports = (on, config) => {
     writeScreenshotFile({ filePath, content }) {
       fs.ensureDirSync(path.dirname(filePath));
       fs.writeFileSync(path.resolve(filePath), content, 'base64');
-      return null;
-    },
-    cleanUp({ filePath }) {
-      const resolvedPath = path.resolve(filePath);
-      if (fs.existsSync(resolvedPath)) {
-        fs.unlinkSync(resolvedPath);
-      }
       return null;
     },
     log(message) {

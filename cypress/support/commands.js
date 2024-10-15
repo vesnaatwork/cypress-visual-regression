@@ -17,24 +17,26 @@ Cypress.Commands.add('pauseAndBlackOutVideos', () => {
   });
 
   
-  Cypress.Commands.add('captureScreenshot', (fileName, targetFolder) => {
+  Cypress.Commands.add('captureScreenshot', (fileName, targetFolder = 'screenshots') => {
     cy.screenshot(fileName, { capture: 'viewport' }).then(() => {
-      const specFileName = Cypress.spec.name.split('/').pop().replace('.js', '');
-      const sourcePath = `cypress/screenshots/${specFileName}/${fileName}.png`;
-      const targetPath = `${targetFolder}/${fileName}.png`;
+      const specFileName = Cypress.spec.name.split('/').pop(); // This will return `visualRegresion.spec.js`
+      const sourcePath = `cypress/screenshots/${specFileName}/${fileName}.png`; // Correct temporary path with .js
+      const customTargetPath = `${targetFolder}/${fileName}.png`;
   
       cy.task('readScreenshotFile', { filePath: sourcePath }).then((fileContent) => {
-        cy.task('writeScreenshotFile', { filePath: targetPath, content: fileContent }).then(() => {
-          // cy.task('cleanUp', { filePath: sourcePath });
-          console.log('file saved');
+        cy.task('writeScreenshotFile', { filePath: customTargetPath, content: fileContent }).then(() => {
+          console.log(`Screenshot saved to ${customTargetPath}`);
         });
       });
     });
   });
   
+  
+  
   Cypress.Commands.add('compareScreenshots', (fileName, { isBaseline }) => {
     if (isBaseline) return;
-    
+  
+    const specFileName = Cypress.spec.name.split('/').pop(); // Ensure it reflects `visualRegresion.spec.js`
     const basePath = `cypress/screenshots/base/${fileName}.png`;
     const currentPath = `cypress/screenshots/compare/${fileName}.png`;
     const diffPath = `cypress/screenshots/diff/${fileName}-diff.png`;
@@ -57,3 +59,4 @@ Cypress.Commands.add('pauseAndBlackOutVideos', () => {
       });
     });
   });
+  
