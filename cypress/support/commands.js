@@ -1,4 +1,6 @@
-import fs from 'fs';
+import { PNG } from 'pngjs';
+import pixelmatch from 'pixelmatch';
+
 
 Cypress.Commands.add('pauseAndBlackOutVideos', () => {
     cy.get('#player .vp-telecine video', { timeout: 10000 }).then(($video) => { // Adjust the selector as necessary
@@ -14,14 +16,46 @@ Cypress.Commands.add('pauseAndBlackOutVideos', () => {
     });
   });
 
+  
+  Cypress.Commands.add('captureScreenshot', (fileName, targetFolder = 'screenshots') => {
+    cy.screenshot(fileName, { capture: 'fullPage' }).then(() => {
+      const specFileName = Cypress.spec.name.split('/').pop(); // This will return `visualRegresion.spec.js`
+      const sourcePath = `cypress/screenshots/${specFileName}/${fileName}.png`; // Correct temporary path with .js
+      const customTargetPath = `${targetFolder}/${fileName}.png`;
+  
+      cy.task('readScreenshotFile', { filePath: sourcePath }).then((fileContent) => {
+        cy.task('writeScreenshotFile', { filePath: customTargetPath, content: fileContent }).then(() => {
+          console.log(`Screenshot saved to ${customTargetPath}`);
+        });
+      });
+    });
+  });
+  
+  
+  
+  Cypress.Commands.add('compareScreenshots', (fileName, { isBaseline }) => {
+  if (isBaseline) return;
 
-Cypress.Commands.add('captureScreenshot', (fileName, targetFolder) => {
-  cy.screenshot(fileName, { capture: 'viewport' }).then(() => {
-    const sourcePath = `cypress/screenshots/${Cypress.spec.name}/${fileName}.png`;
-    const targetPath = `${targetFolder}/${fileName}.png`;
+  const specFileName = Cypress.spec.name.split('/').pop(); // Ensure it reflects `visualRegresion.spec.js`
+  const basePath = `cypress/screenshots/base/${fileName}.png`;
+  const currentPath = `cypress/screenshots/compare/${fileName}.png`;
+  const diffPath = `cypress/screenshots/diff/${fileName}-diff.png`;
 
-    cy.readFile(sourcePath, 'base64').then((fileContent) => {
-      cy.writeFile(targetPath, fileContent, 'base64');
+  cy.task('readScreenshotFile', { filePath: basePath }).then((baseImageBase64) => {
+    cy.task('readScreenshotFile', { filePath: currentPath }).then((currentImageBase64) => {
+      const baseBuffer = Buffer.from(baseImageBase64, 'base64');
+      const currentBuffer = Buffer.from(currentImageBase64, 'base64');
+
+      const baseImage = PNG.sync.read(baseBuffer);
+      const currentImage = PNG.sync.read(currentBuffer);
+
+      const { width, height } = baseImage;
+      const diff = new PNG({ width, height });
+
+      const numDiffPixels = pixelmatch(baseImage.data, currentImage.data, diff.data, width, height);
+
+      cy.task('writeScreenshotFile', { filePath: diffPath, content: PNG.sync.write(diff).toString('base64') });
+      expect(numDiffPixels).to.be.lessThan(100);
     });
   });
 });

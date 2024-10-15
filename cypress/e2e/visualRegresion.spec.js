@@ -1,12 +1,9 @@
-import pixelmatch from 'pixelmatch';
-import { PNG } from 'pngjs';
-
-const fs = require('fs');
-
 describe('Visual Regression Testing', () => {
   beforeEach(() => {
-    cy.visit('/'); // Dynamically uses the baseUrl set in config
+    cy.task('cleanComparisonScreenshots'); // Clean only comparison screenshots
+    cy.visit('/');
   });
+
   const scenarios = [
     { cookiesAccepted: false, description: 'without-cookies' },
     { cookiesAccepted: true, description: 'with-cookies' }
@@ -21,10 +18,6 @@ describe('Visual Regression Testing', () => {
   ];
 
   const isBaseline = Cypress.env('baseline');
-
-  beforeEach(() => {
-    cy.visit('/');
-  });
 
   scenarios.forEach(({ cookiesAccepted, description }) => {
     breakpoints.forEach(({ name, width }) => {
@@ -43,6 +36,9 @@ describe('Visual Regression Testing', () => {
         const folder = isBaseline ? 'cypress/screenshots/base' : 'cypress/screenshots/compare';
 
         cy.captureScreenshot(fileName, folder);
+        if (!isBaseline) {
+          cy.compareScreenshots(fileName, { isBaseline });
+        }
       });
     });
   });
