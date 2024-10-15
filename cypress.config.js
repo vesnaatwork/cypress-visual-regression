@@ -10,17 +10,22 @@ module.exports = defineConfig({
         },
       });
 
-      // Conditionally set the base URL based on an environment variable or a default
-      const environment = config.env.environment || 'dev'; // This could be a CLI argument too
-      config.baseUrl = config.env[`${environment}Url`] || 'http://localhost:3000'; // Default fallback
+      const environment = config.env.environment || 'dev'; // Default to 'dev'
 
+      // Define base URLs for environments
+      const urls = {
+        dev: config.env.devUrl,
+        prod: config.env.prodUrl,
+      };
+
+      config.baseUrl = urls[environment];
       return config;
     },
     // Define different URLs here for each environment
     env: {
       devUrl: 'http://workco-2020-dev.s3-website-us-east-1.amazonaws.com/',
       prodUrl: 'http://work.co',
-      baseline: true, // Default to baseline capture
+      baseline: process.env.CYPRESS_CAP===true, // Uses the environment variable to set baseline functionality
     },
     specPattern: 'cypress/e2e/**/*.{js,ts}',
   },

@@ -1,7 +1,6 @@
-import pixelmatch from 'pixelmatch';
-import { PNG } from 'pngjs';
-
 const fs = require('fs');
+const path = require('path');
+
 
 describe('Visual Regression Testing', () => {
   beforeEach(() => {
@@ -22,9 +21,6 @@ describe('Visual Regression Testing', () => {
 
   const isBaseline = Cypress.env('baseline');
 
-  beforeEach(() => {
-    cy.visit('/');
-  });
 
   scenarios.forEach(({ cookiesAccepted, description }) => {
     breakpoints.forEach(({ name, width }) => {
