@@ -34,7 +34,8 @@ describe('Visual Regression Testing', () => {
     });
   });
    // Add the after hook to clean up the screenshots folder after the tests finish
-   after(() => {
-    cy.task('deleteScreenshotsFolders');
-  });
+   //for now this isn't working, there is some issue with the path
+  //  after(() => {
+  //   cy.task('deleteScreenshotsFolders');
+  // });
 });

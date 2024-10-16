@@ -41,14 +41,19 @@ module.exports = defineConfig({
             path.join(__dirname, '..', '..', 'cypress', 'screenshots', 'compare'),
             path.join(__dirname, '..', '..', 'cypress', 'screenshots', 'visualRegresion.spec.js')
           ];
-    
+      
           foldersToDelete.forEach(folder => {
+            console.log(`Checking if folder exists: ${folder}`);
+            
             if (fs.existsSync(folder)) {
+              console.log(`Deleting folder: ${folder}`);
               fs.rmdirSync(folder, { recursive: true });  // Delete folder and contents
+            } else {
+              console.log(`Folder not found: ${folder}`);
             }
           });
-    
-          return null;
+      
+          return null; // Return null to signify task completion
         },
       });
       
