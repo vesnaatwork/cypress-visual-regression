@@ -1,4 +1,4 @@
-const { scenarios, breakpoints, pages, isBaseline } = require('../config'); // Load from config.js
+const { scenarios, breakpoints, pages } = require('../config'); // Load from config.js
 
 describe('Visual Regression Testing', () => {
   
@@ -11,7 +11,7 @@ describe('Visual Regression Testing', () => {
       scenarios.forEach(({ cookiesAccepted, description }) => {
         breakpoints.forEach(({ name, width }) => {
           it(`should verify visual appearance on ${page} ${description} at ${width}px`, () => {
-            cy.viewport(width, 800);
+            cy.viewport(width, 1440);
 
             if (cookiesAccepted) {
               cy.get('.CookieButton.CookieButton-primary')
@@ -20,9 +20,17 @@ describe('Visual Regression Testing', () => {
             } else {
               cy.get('.CookieButton.CookieButton-primary').should('be.visible');
             }
+            cy.wait(1000); // Adjust as necessary
+
+            // Optional: Scroll to the bottom if necessary to ensure full visibility
+            cy.scrollTo('bottom');
+
+            // Optional: Wait for any additional content to load after scrolling
+            cy.wait(1000); // Adjust as necessary
+
             const fileName = `${page.replace(/\//g, '-')}-${description}-${name}`;
-            const folder = isBaseline ? 'cypress/screenshots/base' : 'cypress/screenshots/compare';
-            if (isBaseline) {
+            const folder = Cypress.env('isBaseline') ? 'cypress/screenshots/base' : 'cypress/screenshots/compare';
+            if (Cypress.env('isBaseline')) {
               cy.captureScreenshot(fileName, 'cypress/screenshots/base');
             } else {
               cy.captureScreenshot(fileName, 'cypress/screenshots/compare');
