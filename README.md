@@ -16,6 +16,6 @@ screenshots/diff
 
 Commands for running tests
 
-taking base screenshots `CYPRESS_CAP=true npx cypress run --env environment=prod`
+taking base screenshots change the .env to have value `CYPRESS_CAP=true` and run in terminal`npx cypress run --env environment=prod`
 
-compare the `CYPRESS_CAP=false npx cypress run --env environment=dev`
+comparing the screenshots  change the .env to have value `CYPRESS_CAP=false` the `npx cypress run --env environment=dev`
