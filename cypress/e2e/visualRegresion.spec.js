@@ -30,7 +30,8 @@ describe('Visual Regression Testing', () => {
 
             const fileName = `${page.replace(/\//g, '-')}-${description}-${name}`;
             const folder = Cypress.env('isBaseline') ? 'cypress/screenshots/base' : 'cypress/screenshots/compare';
-            if (Cypress.env('isBaseline')) {
+            const isBaseline=Cypress.env('isBaseline');
+            if (isBaseline) {
               cy.captureScreenshot(fileName, 'cypress/screenshots/base');
             } else {
               cy.captureScreenshot(fileName, 'cypress/screenshots/compare');
