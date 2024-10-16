@@ -20,14 +20,24 @@ module.exports = (on, config) => {
       return null;
     },
     deleteScreenshotsFolders() {
+      // Ensure paths are built relative to the project root
+       // Manually set the project path. Adjust this if necessary.
+       const projectRoot = path.join(__dirname, '..', '..', 'projects', 'cypress-visual-regression');
+     
       const foldersToDelete = [
-        path.join(__dirname, '..', '..', 'cypress', 'screenshots', 'compare'),
-        path.join(__dirname, '..', '..', 'cypress', 'screenshots', 'visualRegresion.spec.js')
+        path.join(projectRoot, 'cypress', 'screenshots', 'compare'),
+        path.join(projectRoot, 'cypress', 'screenshots', 'visualRegresion.spec.js')
       ];
 
+      // Log the paths for debugging
       foldersToDelete.forEach(folder => {
+        console.log(`Checking if folder exists: ${folder}`);
+
         if (fs.existsSync(folder)) {
-          fs.rmdirSync(folder, { recursive: true });  // Delete folder and contents
+          console.log(`Deleting folder: ${folder}`);
+          fs.removeSync(folder);  // fs-extra's method for recursive folder deletion
+        } else {
+          console.log(`Folder not found: ${folder}`);
         }
       });
 
