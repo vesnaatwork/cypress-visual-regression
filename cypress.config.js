@@ -35,8 +35,23 @@ module.exports = defineConfig({
             fs.unlinkSync(resolvedPath);
           }
           return null;
-        }
+        },
+        deleteScreenshotsFolders() {
+          const foldersToDelete = [
+            path.join(__dirname, '..', '..', 'cypress', 'screenshots', 'compare'),
+            path.join(__dirname, '..', '..', 'cypress', 'screenshots', 'visualRegresion.spec.js')
+          ];
+    
+          foldersToDelete.forEach(folder => {
+            if (fs.existsSync(folder)) {
+              fs.rmdirSync(folder, { recursive: true });  // Delete folder and contents
+            }
+          });
+    
+          return null;
+        },
       });
+      
 
       const environment = config.env.environment || 'dev'; // Default to 'dev'
 
