@@ -1,45 +1,40 @@
+const { scenarios, breakpoints, pages, isBaseline } = require('../config'); // Load from config.js
+
 describe('Visual Regression Testing', () => {
-  beforeEach(() => {
-    cy.task('cleanComparisonScreenshots'); // Clean only comparison screenshots
-    cy.visit('/');
-  });
+  
+  pages.forEach((page) => {
+    describe(`Testing ${page} page`, () => {
+      beforeEach(() => {
+        cy.visit(page); // Visit the current page slug
+      });
 
-  const scenarios = [
-    { cookiesAccepted: false, description: 'without-cookies' },
-    { cookiesAccepted: true, description: 'with-cookies' }
-  ];
+      scenarios.forEach(({ cookiesAccepted, description }) => {
+        breakpoints.forEach(({ name, width }) => {
+          it(`should verify visual appearance on ${page} ${description} at ${width}px`, () => {
+            cy.viewport(width, 800);
 
-  const breakpoints = [
-    { name: 'S', width: 375 },
-    { name: 'M', width: 768 },
-    { name: 'L', width: 1024 },
-    { name: 'XL', width: 1440 },
-    { name: 'XXL', width: 2560 }
-  ];
+            if (cookiesAccepted) {
+              cy.get('.CookieButton.CookieButton-primary')
+                .should('be.visible')
+                .click();
+            } else {
+              cy.get('.CookieButton.CookieButton-primary').should('be.visible');
+            }
 
-  const isBaseline = Cypress.env('baseline');
+            const fileName = `${page.replace(/\//g, '-')}-${description}-${name}`;
+            const folder = isBaseline ? 'cypress/screenshots/base' : 'cypress/screenshots/compare';
 
-  scenarios.forEach(({ cookiesAccepted, description }) => {
-    breakpoints.forEach(({ name, width }) => {
-      it(`should verify visual appearance on ${description} at ${width}px`, () => {
-        cy.viewport(width, 800);
-
-        if (cookiesAccepted) {
-          cy.get('.CookieButton.CookieButton-primary')
-            .should('be.visible')
-            .click();
-        } else {
-          cy.get('.CookieButton.CookieButton-primary').should('be.visible');
-        }
-
-        const fileName = `homepage-${description}-${name}`;
-        const folder = isBaseline ? 'cypress/screenshots/base' : 'cypress/screenshots/compare';
-
-        cy.captureScreenshot(fileName, folder);
-        if (!isBaseline) {
-          cy.compareScreenshots(fileName, { isBaseline });
-        }
+            cy.captureScreenshot(fileName, folder);
+            if (!isBaseline) {
+              cy.compareScreenshots(fileName, { isBaseline });
+            }
+          });
+        });
       });
     });
+  });
+   // Add the after hook to clean up the screenshots folder after the tests finish
+   after(() => {
+    cy.task('deleteScreenshotsFolders');
   });
 });
