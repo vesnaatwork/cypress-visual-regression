@@ -19,9 +19,11 @@ Cypress.Commands.add('pauseAndBlackOutVideos', () => {
   
   Cypress.Commands.add('captureScreenshot', (fileName, targetFolder = 'screenshots') => {
     cy.screenshot(fileName, { capture: 'fullPage' }).then(() => {
-      const specFileName = Cypress.spec.name.split('/').pop(); // This will return `visualRegresion.spec.js`
-      const sourcePath = `cypress/screenshots/${specFileName}/${fileName}.png`; // Correct temporary path with .js
+      const specFileName = Cypress.spec.name.split('/').pop(); // Extract the spec filename
+      const sourcePath = `cypress/screenshots/${specFileName}/${fileName}.png`;  // Correct path
       const customTargetPath = `${targetFolder}/${fileName}.png`;
+  
+      console.log(`Saving screenshot: Source path: ${sourcePath}, Target path: ${customTargetPath}`);
   
       cy.task('readScreenshotFile', { filePath: sourcePath }).then((fileContent) => {
         cy.task('writeScreenshotFile', { filePath: customTargetPath, content: fileContent }).then(() => {
@@ -30,6 +32,7 @@ Cypress.Commands.add('pauseAndBlackOutVideos', () => {
       });
     });
   });
+  
   
   
   

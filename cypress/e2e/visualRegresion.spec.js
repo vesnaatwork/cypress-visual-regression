@@ -20,12 +20,12 @@ describe('Visual Regression Testing', () => {
             } else {
               cy.get('.CookieButton.CookieButton-primary').should('be.visible');
             }
-
             const fileName = `${page.replace(/\//g, '-')}-${description}-${name}`;
             const folder = isBaseline ? 'cypress/screenshots/base' : 'cypress/screenshots/compare';
-
-            cy.captureScreenshot(fileName, folder);
-            if (!isBaseline) {
+            if (isBaseline) {
+              cy.captureScreenshot(fileName, 'cypress/screenshots/base');
+            } else {
+              cy.captureScreenshot(fileName, 'cypress/screenshots/compare');
               cy.compareScreenshots(fileName, { isBaseline });
             }
           });
