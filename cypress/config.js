@@ -13,8 +13,8 @@ module.exports = {
       { name: 'XXL', width: 2560 }
     ],
     pages : [
-        '/',
-        // '/clients',
+        // '/',
+        '/clients',
         // '/grid',
         // '/company',
         // '/outcomes',
