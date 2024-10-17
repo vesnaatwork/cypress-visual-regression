@@ -24,7 +24,6 @@ Cypress.Commands.add('pauseAndBlackOutVideos', () => {
       const customTargetPath = `${targetFolder}/${fileName}.png`;
   
       console.log(`Saving screenshot: Source path: ${sourcePath}, Target path: ${customTargetPath}`);
-  
       cy.task('readScreenshotFile', { filePath: sourcePath }).then((fileContent) => {
         cy.task('writeScreenshotFile', { filePath: customTargetPath, content: fileContent }).then(() => {
           console.log(`Screenshot saved to ${customTargetPath}`);

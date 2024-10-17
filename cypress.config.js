@@ -10,7 +10,9 @@ module.exports = defineConfig({
   e2e: {
     screenshotsFolder: 'cypress/screenshots',
     trashAssetsBeforeRuns: false, 
+    browser: 'chrome',
     setupNodeEvents(on, config) {
+
       const cypressCap = config.env.CYPRESS_CAP || process.env.CYPRESS_CAP;
 
       // Log both to check
@@ -20,7 +22,14 @@ module.exports = defineConfig({
       config.env.isBaseline = cypressCap === 'true';
 
       console.log(`isBaseline value: ${config.env.isBaseline}`);
-      
+     
+      on('before:browser:launch', (browser = {}, launchOptions) => {
+        if (browser.name === 'chrome') {
+          launchOptions.args.push('--force-device-scale-factor=1');
+        }
+        return launchOptions;
+      });
+
       on('task', {
         // Clean up comparison screenshots only, not the baseline ones
         cleanComparisonScreenshots() {
@@ -45,10 +54,13 @@ module.exports = defineConfig({
         writeScreenshotFile({ filePath, content }) {
           console.log(`Writing screenshot from: ${filePath}`); // Add this line
           fs.ensureDirSync(path.dirname(filePath));
+          const contentSizeKb = Buffer.byteLength(content, 'base64') / 1024;
+          console.log(`Writing screenshot from: ${filePath}`); 
+          console.log(`Screenshot content size: ${contentSizeKb.toFixed(2)} KB`); // Log content size
+        
           fs.writeFileSync(path.resolve(filePath), content, 'base64');
           return true;  // Return true instead of null
         },
-
         // Clean up specific file
         cleanUp({ filePath }) {
           const resolvedPath = path.resolve(filePath);
