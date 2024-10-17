@@ -17,7 +17,15 @@ Cypress.Commands.add('pauseAndBlackOutVideos', () => {
   });
 
   
-  Cypress.Commands.add('captureScreenshot', (fileName, targetFolder = 'screenshots') => {
+  Cypress.Commands.add('captureScreenshot', (fileName, targetFolder = 'screenshots', desiredWidth = 800, desiredHeight = 600) => {
+    // Apply CSS transform to zoom out the page
+    cy.document().then((doc) => {
+      const style = doc.createElement('style');
+      style.innerHTML = 'body { transform: scale(0.5); transform-origin: 0 0; }'; // Adjust scale as needed
+      doc.head.appendChild(style);
+      style.setAttribute('id', 'custom-zoom-style'); // Add an identifier to the style element for easy removal
+    });
+  
     cy.screenshot(fileName, { capture: 'fullPage' }).then(() => {
       const specFileName = Cypress.spec.name.split('/').pop(); // Extract the spec filename
       const sourcePath = `cypress/screenshots/${specFileName}/${fileName}.png`;  // Correct path
@@ -25,12 +33,41 @@ Cypress.Commands.add('pauseAndBlackOutVideos', () => {
   
       console.log(`Saving screenshot: Source path: ${sourcePath}, Target path: ${customTargetPath}`);
       cy.task('readScreenshotFile', { filePath: sourcePath }).then((fileContent) => {
-        cy.task('writeScreenshotFile', { filePath: customTargetPath, content: fileContent }).then(() => {
+        // Decode the image content from base64
+        const buffer = Buffer.from(fileContent, 'base64');
+        const png = PNG.sync.read(buffer);
+  
+        // Adjust the canvas size using the adjustCanvas function with parameters
+        const adjustedPng = adjustCanvas(png, desiredWidth, desiredHeight);
+  
+        // Encode the adjusted image back to base64
+        const adjustedBuffer = PNG.sync.write(adjustedPng);
+  
+        cy.task('writeScreenshotFile', { filePath: customTargetPath, content: adjustedBuffer.toString('base64') }).then(() => {
           console.log(`Screenshot saved to ${customTargetPath}`);
         });
       });
+    }).then(() => {
+      // Remove the CSS transform after screenshot is taken
+      cy.document().then((doc) => {
+        const style = doc.getElementById('custom-zoom-style');
+        if (style) {
+          style.remove();
+        }
+      });
     });
   });
+  
+  // The adjustCanvas function to adjust image dimensions if required
+  export const adjustCanvas = (image, width, height) => {
+    if (image.width === width && image.height === height) {
+      return image;
+    }
+    const imageAdjustedCanvas = new PNG({ width, height, inputHasAlpha: true });
+    PNG.bitblt(image, imageAdjustedCanvas, 0, 0, Math.min(image.width, width), Math.min(image.height, height), 0, 0);
+    return imageAdjustedCanvas;
+  };
+  
   
   
   
