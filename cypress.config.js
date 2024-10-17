@@ -25,11 +25,11 @@ module.exports = defineConfig({
      
       on('before:browser:launch', (browser = {}, launchOptions) => {
         if (browser.name === 'chrome') {
-          launchOptions.args.push('--force-device-scale-factor=1');
+          launchOptions.args.push('--force-device-scale-factor=0.5'); // Adjust scale
         }
         return launchOptions;
       });
-
+      
       on('task', {
         // Clean up comparison screenshots only, not the baseline ones
         cleanComparisonScreenshots() {

@@ -1,7 +1,7 @@
 const { scenarios, breakpoints, pages } = require('../config'); // Load from config.js
 
 describe('Visual Regression Testing', () => {
-  
+
   pages.forEach((page) => {
     describe(`Testing ${page} page`, () => {
       beforeEach(() => {
@@ -22,29 +22,36 @@ describe('Visual Regression Testing', () => {
             }
             cy.wait(1000); // Adjust as necessary
 
-            // Optional: Scroll to the bottom if necessary to ensure full visibility
+            // Scroll to the bottom if necessary to ensure full content is rendered
             cy.scrollTo('bottom');
 
             // Optional: Wait for any additional content to load after scrolling
             cy.wait(1000); // Adjust as necessary
 
-            const fileName = `${page.replace(/\//g, '-')}-${description}-${name}`;
-            const folder = Cypress.env('isBaseline') ? 'cypress/screenshots/base' : 'cypress/screenshots/compare';
-            const isBaseline=Cypress.env('isBaseline');
-            if (isBaseline) {
-              cy.captureScreenshot(fileName, 'cypress/screenshots/base');
-            } else {
-              cy.captureScreenshot(fileName, 'cypress/screenshots/compare');
-              cy.compareScreenshots(fileName, { isBaseline });
-            }
+            // Calculate the dynamic height
+            cy.document().then((doc) => {
+              const bodyHeight = doc.body.scrollHeight;
+
+              const fileName = `${page.replace(/\//g, '-')}-${description}-${name}`;
+              const folder = Cypress.env('isBaseline') ? 'cypress/screenshots/base' : 'cypress/screenshots/compare';
+              const isBaseline = Cypress.env('isBaseline');
+
+              if (isBaseline) {
+                cy.captureScreenshot(fileName, 'cypress/screenshots/base', width, bodyHeight);
+              } else {
+                cy.captureScreenshot(fileName, 'cypress/screenshots/compare', width, bodyHeight);
+                cy.compareScreenshots(fileName, { isBaseline });
+              }
+            });
           });
         });
       });
     });
   });
-   // Add the after hook to clean up the screenshots folder after the tests finish
-   //for now this isn't working, there is some issue with the path
-  //  after(() => {
+
+  // Add the after hook to clean up the screenshots folder after the tests finish
+  // for now this isn't working, there is some issue with the path
+  // after(() => {
   //   cy.task('deleteScreenshotsFolders');
   // });
 });
