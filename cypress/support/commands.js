@@ -57,7 +57,20 @@ Cypress.Commands.add('pauseAndBlackOutVideos', () => {
       });
     });
   });
-  
+  Cypress.Commands.add('captureScreenshotWithoutScaling', (fileName, targetFolder) => {
+    // Set viewport size to the desired width/height
+    
+    // Capture full-page screenshot
+    cy.screenshot(fileName, { capture: 'fullPage' }).then(() => {
+        const specFileName = Cypress.spec.name.split('/').pop();
+        const sourcePath = `cypress/screenshots/${specFileName}/${fileName}.png`;
+        const targetPath = `${targetFolder}/${fileName}.png`;
+
+        cy.task('cropScreenshot', { sourcePath, targetPath }).then(() => {
+            console.log(`Screenshot saved and cropped: ${targetPath}`);
+        });
+    });
+  });
   // The adjustCanvas function to adjust image dimensions if required
   export const adjustCanvas = (image, width, height) => {
     if (image.width === width && image.height === height) {

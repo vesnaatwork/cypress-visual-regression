@@ -2,6 +2,7 @@ const { defineConfig } = require('cypress');
 const fs = require('fs-extra');
 const path = require('path');
 const dotenv = require('dotenv');
+const sharp = require('sharp');
 
 // Load variables from .env
 dotenv.config();
@@ -22,13 +23,6 @@ module.exports = defineConfig({
       config.env.isBaseline = cypressCap === 'true';
 
       console.log(`isBaseline value: ${config.env.isBaseline}`);
-     
-      on('before:browser:launch', (browser = {}, launchOptions) => {
-        if (browser.name === 'chrome') {
-          launchOptions.args.push('--force-device-scale-factor=0.5'); // Adjust scale
-        }
-        return launchOptions;
-      });
       
       on('task', {
         // Clean up comparison screenshots only, not the baseline ones
@@ -40,17 +34,6 @@ module.exports = defineConfig({
           return true;  // Return true instead of null
         },
 
-        // Read a screenshot file
-        readScreenshotFile({ filePath }) {
-          const resolvedPath = path.resolve(filePath);
-          console.log(`Reading screenshot from: ${resolvedPath}`); // Add this line
-          if (fs.existsSync(resolvedPath)) {
-            return fs.readFileSync(resolvedPath, 'base64');
-          }
-          throw new Error(`File not found: ${resolvedPath}`);
-        },
-        
-        // Write the screenshot file
         writeScreenshotFile({ filePath, content }) {
           console.log(`Writing screenshot from: ${filePath}`); // Add this line
           fs.ensureDirSync(path.dirname(filePath));
@@ -60,6 +43,22 @@ module.exports = defineConfig({
         
           fs.writeFileSync(path.resolve(filePath), content, 'base64');
           return true;  // Return true instead of null
+        },
+        readScreenshotFile({ filePath }) {
+          return fs.readFileSync(filePath, 'base64');
+        },
+        cropScreenshot({ sourcePath, targetPath }) {
+          return new Promise((resolve, reject) => {
+            sharp(sourcePath)
+              .trim()  // Automatically remove black borders
+              .toFile(targetPath, (err, info) => {
+                if (err) {
+                  reject(`Error during screenshot cropping: ${err.message}`);
+                } else {
+                  resolve(`Cropped screenshot saved at: ${targetPath}`);
+                }
+              });
+          });
         },
         // Clean up specific file
         cleanUp({ filePath }) {
@@ -91,6 +90,17 @@ module.exports = defineConfig({
           return null; // Return null to signify task completion
         },
       });
+      on('before:browser:launch', (browser, launchOptions) => {
+        const viewportWidth = process.env.VIEWPORT_WIDTH || 2560; // Default width
+        const viewportHeight = process.env.VIEWPORT_HEIGHT || 1920; // Default height
+
+        // fullPage screenshot size is 1400x1200 on non-retina screens
+        // and 2800x2400 on retina screens
+        launchOptions.args.push(`--window-size=${viewportWidth},${viewportHeight}`)
+        // force screen to be non-retina (1400x1200 size)
+        launchOptions.args.push('--force-device-scale-factor=1')
+        return launchOptions
+      })
 
      // Log the environment being used
      const environment = config.env.environment || 'dev';

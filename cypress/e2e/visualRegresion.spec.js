@@ -4,14 +4,19 @@ describe('Visual Regression Testing', () => {
 
   pages.forEach((page) => {
     describe(`Testing ${page} page`, () => {
+      
       beforeEach(() => {
         cy.visit(page); // Visit the current page slug
       });
 
       scenarios.forEach(({ cookiesAccepted, description }) => {
-        breakpoints.forEach(({ name, width }) => {
+        breakpoints.forEach(({ name, width,height }) => {
+          before(() => {
+            process.env.VIEWPORT_WIDTH = width.toString();
+            process.env.VIEWPORT_HEIGHT = height.toString();
+          });
           it(`should verify visual appearance on ${page} ${description} at ${width}px`, () => {
-            cy.viewport(width, 1440);
+            cy.viewport(width, height);
 
             if (cookiesAccepted) {
               cy.get('.CookieButton.CookieButton-primary')
@@ -30,16 +35,17 @@ describe('Visual Regression Testing', () => {
 
             // Calculate the dynamic height
             cy.document().then((doc) => {
-              const bodyHeight = doc.body.scrollHeight;
 
               const fileName = `${page.replace(/\//g, '-')}-${description}-${name}`;
               const folder = Cypress.env('isBaseline') ? 'cypress/screenshots/base' : 'cypress/screenshots/compare';
               const isBaseline = Cypress.env('isBaseline');
 
               if (isBaseline) {
-                cy.captureScreenshot(fileName, 'cypress/screenshots/base', width, bodyHeight);
+                // cy.captureScreenshot(fileName, 'cypress/screenshots/base', width, bodyHeight);
+                cy.captureScreenshotWithoutScaling(fileName,'cypress/screenshots/base');
               } else {
-                cy.captureScreenshot(fileName, 'cypress/screenshots/compare', width, bodyHeight);
+                // cy.captureScreenshot(fileName, 'cypress/screenshots/compare', width, bodyHeight);
+                cy.captureScreenshotWithoutScaling(fileName,'cypress/screenshots/compare');
                 cy.compareScreenshots(fileName, { isBaseline });
               }
             });
