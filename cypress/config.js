@@ -6,11 +6,11 @@ module.exports = {
     ],
   
     breakpoints: [
-      { name: 'S', width: 375 },
+      { name: 'S', width: 375,height:800 },
       { name: 'M', width: 768 },
       { name: 'L', width: 1024 },
       { name: 'XL', width: 1440 },
-      { name: 'XXL', width: 2560 }
+      { name: 'XXL', width: 2560, height:1920 }
     ],
     pages : [
         '/',
