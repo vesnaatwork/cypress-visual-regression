@@ -1,8 +1,8 @@
 
 module.exports = {
     scenarios: [
-      { cookiesAccepted: false, description: 'with-cookies' },
-      // { cookiesAccepted: true, description: 'without-cookies' }
+      // { cookiesAccepted: false, description: 'with-cookies' },
+      { cookiesAccepted: true, description: 'without-cookies' }
     ],
   
     breakpoints: [

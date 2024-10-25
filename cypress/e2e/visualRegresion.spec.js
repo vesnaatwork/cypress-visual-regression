@@ -1,7 +1,15 @@
 const { scenarios, breakpoints, pages } = require('../config'); // Load from config.js
 
 describe('Visual Regression Testing', () => {
-
+  afterEach(() => {
+    if ( Cypress.config('isBaseline')!==true) { 
+      cy.state('aliases')?.comparisonResult && cy.get('@comparisonResult').then(({ diff, diffPath }) => {
+        if (diff) { // Only write if `diff` exists
+          cy.writeDiffFile(diff, diffPath);
+        }
+      });
+    }
+  });
   pages.forEach((page) => {
     describe(`Testing ${page} page`, () => {
       
@@ -47,18 +55,27 @@ describe('Visual Regression Testing', () => {
               if(isBaseline===false) {
                 // cy.captureScreenshot(fileName, 'cypress/screenshots/compare', width, bodyHeight);
                 cy.captureScreenshotWithoutScaling(fileName,'cypress/screenshots/compare');
-                cy.compareScreenshots(fileName, { isBaseline });
-              }
-            });
+                cy.compareScreenshots(fileName, { isBaseline }).then(({ numDiffPixels, diff }) => {
+                  cy.wrap({ diff, numDiffPixels }).as('comparisonResult');
+                })
+                .then(() => {
+                  // Perform the assertion separately to ensure file writing is not blocked by test failure
+                  cy.get('@comparisonResult').then(({ numDiffPixels }) => {
+                    expect(numDiffPixels).to.be.lessThan(100);
+                  });
+                });
+            };
           });
         });
       });
     });
   });
+ 
 
   // Add the after hook to clean up the screenshots folder after the tests finish
   // for now this isn't working, there is some issue with the path
   // after(() => {
   //   cy.task('deleteScreenshotsFolders');
   // });
-});
+ });
+})
