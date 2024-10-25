@@ -16,8 +16,10 @@ screenshots/diff
 
 Commands for running tests
 
-taking base screenshots change the .env to have value `CYPRESS_CAP=true` and run in terminal`npx cypress run --env environment=prod --browser chrome`
+taking base screenshots: run in terminal`npx cypress run --env environment=prod --browser chrome` or `npm run base`
 
-comparing the screenshots  change the .env to have value `CYPRESS_CAP=false` the `npx cypress run --env environment=dev --browser chrome`
+comparing the screenshots: `npx cypress run --env environment=dev --browser chrome` or `npm run compare`
+
+delete diff, compare and spec folder contents `npx run cleanup`
 
 If you want to run in headed mode instead of `npx cypress run` use `npx cypress open`
