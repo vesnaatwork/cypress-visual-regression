@@ -6,8 +6,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "create-folders":"node createFolders.js",
     "cleanup": "node cleanupScreenshots.js",
-    "base": "npx cypress run --env environment=dev --browser chrome",
-    "compare":"npx cypress run --env environment=prod --browser chrome"
+    "base": "npx cypress run --env environment=dev,isBaseline=true --browser chrome",
+    "compare":"npx cypress run --env environment=dev,isBaseline=false --browser chrome"
   },
   "keywords": [],
   "author": "",
