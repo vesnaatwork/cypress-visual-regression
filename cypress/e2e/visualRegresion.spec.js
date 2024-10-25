@@ -14,6 +14,7 @@ describe('Visual Regression Testing', () => {
           before(() => {
             process.env.VIEWPORT_WIDTH = width.toString();
             process.env.VIEWPORT_HEIGHT = height.toString();
+      
           });
           it(`should verify visual appearance on ${page} ${description} at ${width}px`, () => {
             cy.viewport(width, height);
@@ -37,13 +38,13 @@ describe('Visual Regression Testing', () => {
             cy.document().then((doc) => {
 
               const fileName = `${page.replace(/\//g, '-')}-${description}-${name}`;
-              const folder = Cypress.env('isBaseline') ? 'cypress/screenshots/base' : 'cypress/screenshots/compare';
-              const isBaseline = Cypress.env('isBaseline');
+              const isBaseline = Cypress.config('isBaseline');
 
-              if (isBaseline) {
+              if (isBaseline===true) {
                 // cy.captureScreenshot(fileName, 'cypress/screenshots/base', width, bodyHeight);
                 cy.captureScreenshotWithoutScaling(fileName,'cypress/screenshots/base');
-              } else {
+              } else 
+              if(isBaseline===false) {
                 // cy.captureScreenshot(fileName, 'cypress/screenshots/compare', width, bodyHeight);
                 cy.captureScreenshotWithoutScaling(fileName,'cypress/screenshots/compare');
                 cy.compareScreenshots(fileName, { isBaseline });

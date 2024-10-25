@@ -7,19 +7,19 @@ module.exports = {
   
     breakpoints: [
       { name: 'S', width: 375,height:700 },
-      { name: 'M', width: 768, height:1000 },
-      { name: 'L', width: 1024, height: 1100},
-      { name: 'XL', width: 1440, height:1200 },
-      { name: 'XXL', width: 2560, height:1920 }
+      // { name: 'M', width: 768, height:1000 },
+      // { name: 'L', width: 1024, height: 1100},
+      // { name: 'XL', width: 1440, height:1200 },
+      // { name: 'XXL', width: 2560, height:1920 }
     ],
     pages : [
         '/',
-        '/clients',
-        '/grid',
-        '/company',
-        '/outcomes',
-        '/process',
-        '/leadership'
+        // '/clients',
+        // '/grid',
+        // '/company',
+        // '/outcomes',
+        // '/process',
+        // '/leadership'
       ]
   };
   
