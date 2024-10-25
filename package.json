@@ -4,7 +4,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "cleanup": "node cleanupScreenshots.js"
+    "cleanup": "node cleanupScreenshots.js",
+    "base": "npx cypress run --env environment=dev --browser chrome",
+    "compare":"npx cypress run --env environment=prod --browser chrome"
   },
   "keywords": [],
   "author": "",

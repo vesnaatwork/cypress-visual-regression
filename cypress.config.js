@@ -1,11 +1,7 @@
 const { defineConfig } = require('cypress');
 const fs = require('fs-extra');
 const path = require('path');
-const dotenv = require('dotenv');
 const sharp = require('sharp');
-
-// Load variables from .env
-dotenv.config();
 
 module.exports = defineConfig({
   e2e: {
@@ -14,15 +10,10 @@ module.exports = defineConfig({
     browser: 'chrome',
     setupNodeEvents(on, config) {
 
-      const cypressCap = config.env.CYPRESS_CAP || process.env.CYPRESS_CAP;
+      // const cypressCap = process.env.isBaseline;
 
-      // Log both to check
-      console.log(`CYPRESS_CAP value: ${cypressCap}`);
-
-      // Set isBaseline
-      config.env.isBaseline = cypressCap === 'true';
-
-      console.log(`isBaseline value: ${config.env.isBaseline}`);
+      // // Log both to check
+      // console.log(`CYPRESS_CAP value: ${cypressCap}`);
       
       on('task', {
         // Clean up comparison screenshots only, not the baseline ones
@@ -102,9 +93,10 @@ module.exports = defineConfig({
         return launchOptions
       })
 
-     // Log the environment being used
      const environment = config.env.environment || 'dev';
      console.log(`Using environment: ${environment}`);
+     config.isBaseline = String(config.env.isBaseline) === 'true';
+     console.log(`is baseline ${config.env.isBaseline}`)
 
      const urls = {
        dev: config.env.devUrl,

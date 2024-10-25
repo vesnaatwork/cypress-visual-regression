@@ -5,7 +5,8 @@ const path = require('path');
 // Define the paths whose contents you want to delete
 const foldersToClean = [
   path.join(__dirname, 'cypress/screenshots', 'compare'), // Adjust the relative path as needed
-  path.join(__dirname, 'cypress/screenshots', 'visualRegresion.spec.js') // Adjust the relative path as needed
+  path.join(__dirname, 'cypress/screenshots', 'visualRegresion.spec.js'),
+  path.join(__dirname, 'cypress/screenshots', 'diff')
 ];
 
 // Function to delete contents of the specified folders
