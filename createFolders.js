@@ -3,7 +3,7 @@ const path = require('path');
 
 // Define the directories
 const mainDirectory = 'cypress/screenshots';
-const subdirectories = ['base', 'compare', 'diff'];
+const subdirectories = ['base', 'compare', 'diff','diff/failed'];
 
 // Create main directory
 if (!fs.existsSync(mainDirectory)) {
