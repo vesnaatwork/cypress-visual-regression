@@ -72,6 +72,7 @@ Cypress.Commands.add('pauseAndBlackOutVideos', () => {
     });
   });
   Cypress.Commands.add('writeDiffFile', (diff, diffPath) => {
+    console.log(`in writeDiffFile ${diff} ${diffPath}`);
     // Write the screenshot file using cy.task and PNG
     if (diff) {
       const content = PNG.sync.write(diff).toString('base64');
@@ -114,7 +115,7 @@ Cypress.Commands.add('pauseAndBlackOutVideos', () => {
       const numDiffPixels = pixelmatch(baseImage.data, currentImage.data, diff.data, width, height);
 
 
-      return cy.wrap({ numDiffPixels, diff });
+      return cy.wrap({ numDiffPixels, diff, diffPath });
     });
   });
 });
