@@ -71,6 +71,14 @@ Cypress.Commands.add('pauseAndBlackOutVideos', () => {
         });
     });
   });
+  Cypress.Commands.add('writeDiffFile', (diff, diffPath) => {
+    console.log(`in writeDiffFile ${diff} ${diffPath}`);
+    // Write the screenshot file using cy.task and PNG
+    if (diff) {
+      const content = PNG.sync.write(diff).toString('base64');
+      cy.task('writeScreenshotFile', { filePath: diffPath, content });
+    }
+  });
   // The adjustCanvas function to adjust image dimensions if required
   export const adjustCanvas = (image, width, height) => {
     if (image.width === width && image.height === height) {
@@ -106,8 +114,8 @@ Cypress.Commands.add('pauseAndBlackOutVideos', () => {
 
       const numDiffPixels = pixelmatch(baseImage.data, currentImage.data, diff.data, width, height);
 
-      cy.task('writeScreenshotFile', { filePath: diffPath, content: PNG.sync.write(diff).toString('base64') });
-      expect(numDiffPixels).to.be.lessThan(100);
+
+      return cy.wrap({ numDiffPixels, diff, diffPath });
     });
   });
 });
